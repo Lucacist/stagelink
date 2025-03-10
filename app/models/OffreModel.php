@@ -25,10 +25,17 @@ class OffreModel {
     }
     
     public function getOffreById($id) {
-        $sql = "SELECT o.*, e.nom as entreprise_nom, e.email as entreprise_email, e.telephone as entreprise_telephone
+        $sql = "SELECT o.*, 
+                e.nom AS entreprise_nom, 
+                e.email AS entreprise_email,
+                e.telephone AS entreprise_telephone,
+                COUNT(c.id) as nombre_candidatures
                 FROM Offres o
                 JOIN Entreprises e ON o.entreprise_id = e.id
-                WHERE o.id = ?";
+                LEFT JOIN Candidatures c ON o.id = c.offre_id
+                WHERE o.id = ?
+                GROUP BY o.id";
+        
         $stmt = $this->db->prepare($sql);
         $stmt->bind_param("i", $id);
         $stmt->execute();
@@ -190,6 +197,20 @@ class OffreModel {
             $stmt->bind_param("ii", $offreId, $utilisateurId);
             return $stmt->execute();
         }
+    }
+
+    public function getAllCompetences() {
+        $sql = "SELECT * FROM Competences ORDER BY nom ASC";
+        $result = $this->db->getConnection()->query($sql);
+        
+        $competences = [];
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $competences[] = $row;
+            }
+        }
+        
+        return $competences;
     }
 }
 ?>

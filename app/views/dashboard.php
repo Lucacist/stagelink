@@ -1,23 +1,24 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-} else {
-    // Session is already started
-}
-require_once 'config.php';
-require_once 'utils/permissions.php';
+// Les vérifications d'authentification et de permissions sont maintenant gérées par le contrôleur
+// if (session_status() === PHP_SESSION_NONE) {
+//     session_start();
+// } else {
+//     // Session is already started
+// }
+// require_once 'config.php';
+// require_once 'utils/permissions.php';
 
-// Vérifier que l'utilisateur est connecté
-if (!isset($_SESSION['user_id'])) {
-    header('Location: index.php?route=login');
-    exit();
-}
+// // Vérifier que l'utilisateur est connecté
+// if (!isset($_SESSION['user_id'])) {
+//     header('Location: index.php?route=login');
+//     exit();
+// }
 
-// Vérifier que l'utilisateur est admin ou pilote
-if (!isset($_SESSION['user_role']) || ($_SESSION['user_role'] !== 'ADMIN' && $_SESSION['user_role'] !== 'PILOTE')) {
-    header('Location: index.php?route=accueil');
-    exit();
-}
+// // Vérifier que l'utilisateur est admin ou pilote
+// if (!isset($_SESSION['user_role']) || ($_SESSION['user_role'] !== 'ADMIN' && $_SESSION['user_role'] !== 'PILOTE')) {
+//     header('Location: index.php?route=accueil');
+//     exit();
+// }
 
 $pageTitle = "Tableau de bord - StageLink";
 include('header.php');
@@ -34,7 +35,7 @@ include('header.php');
     </div>
 
     <div class="dashboard-content">
-        <?php if (hasPermission($_SESSION['user_id'], 'GERER_ENTREPRISES')): ?>
+        <?php if (isset($userPermissions['GERER_ENTREPRISES']) && $userPermissions['GERER_ENTREPRISES']): ?>
         <div class="card">
             <h2>Créer une entreprise</h2>
             <form action="index.php?route=traiter_entreprise" method="POST" class="form-entreprise">
@@ -67,7 +68,7 @@ include('header.php');
         </div>
         <?php endif; ?>
 
-        <?php if (hasPermission($_SESSION['user_id'], 'CREER_OFFRE')): ?>
+        <?php if (isset($userPermissions['CREER_OFFRE']) && $userPermissions['CREER_OFFRE']): ?>
         <div class="card">
             <h2>Créer une offre</h2>
             <form action="index.php?route=traiter_offre" method="POST" class="form-offre">
@@ -77,13 +78,7 @@ include('header.php');
                     <label for="entreprise_id">Entreprise*</label>
                     <select id="entreprise_id" name="entreprise_id" required>
                         <option value="">Sélectionnez une entreprise</option>
-                        <?php 
-                        require_once 'app/models/EntrepriseModel.php';
-                        $entrepriseModel = new EntrepriseModel();
-                        $entreprises = $entrepriseModel->getAllEntreprises();
-                        
-                        foreach ($entreprises as $entreprise): 
-                        ?>
+                        <?php foreach ($entreprises as $entreprise): ?>
                         <option value="<?= $entreprise['id'] ?>"><?= htmlspecialchars($entreprise['nom']) ?></option>
                         <?php endforeach; ?>
                     </select>
@@ -117,13 +112,7 @@ include('header.php');
                 <div class="form-group">
                     <label>Compétences requises*</label>
                     <div class="checkbox-grid">
-                        <?php 
-                        require_once 'app/models/CompetenceModel.php';
-                        $competenceModel = new CompetenceModel();
-                        $competences = $competenceModel->getAllCompetences();
-                        
-                        if (empty($competences)): 
-                        ?>
+                        <?php if (empty($competences)): ?>
                             <p style="grid-column: 1 / -1; text-align: center;">
                                 Aucune compétence disponible. Veuillez en ajouter d'abord.
                             </p>

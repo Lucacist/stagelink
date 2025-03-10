@@ -46,11 +46,19 @@ class EntrepriseController extends Controller {
         // Récupérer les évaluations de l'entreprise
         $evaluations = $this->entrepriseModel->getEvaluations($id);
         
+        // Récupérer les offres de l'entreprise
+        $offres = $this->entrepriseModel->getOffresEntreprise($id);
+        
+        // Récupérer le nombre total de candidatures de l'entreprise
+        $totalCandidatures = $this->entrepriseModel->getTotalCandidaturesEntreprise($id);
+        
         // Afficher les détails de l'entreprise
         echo $this->render('entreprise_details', [
             'pageTitle' => $entreprise['nom'] . ' - StageLink',
             'entreprise' => $entreprise,
-            'evaluations' => $evaluations
+            'evaluations' => $evaluations,
+            'offres' => $offres,
+            'totalCandidatures' => $totalCandidatures
         ]);
     }
     

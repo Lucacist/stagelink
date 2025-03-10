@@ -4,11 +4,11 @@ class Database {
     private $conn;
     
     private function __construct() {
-        // Connexion à la base de données
+        // Paramètres de connexion à la base de données
         $servername = "localhost";
-        $username = "root";  // Par défaut dans WAMP/XAMPP
-        $password = "";      // Laisse vide si aucun mot de passe défini
-        $dbname = "StageLink"; 
+        $username = "root";
+        $password = "";
+        $dbname = "StageLink";
         
         // Création de la connexion
         $this->conn = new mysqli($servername, $username, $password, $dbname);

@@ -140,12 +140,12 @@ class EntrepriseModel {
     }
     
     public function getEvaluations($entrepriseId) {
-        $sql = "SELECT e.*, u.nom, u.prenom
-                FROM Evaluations e 
-                JOIN Utilisateurs u ON e.utilisateur_id = u.id 
-                WHERE e.entreprise_id = ? 
-                ORDER BY e.id DESC";
-        
+        $sql = "SELECT ev.*, u.prenom, u.nom
+                FROM Evaluations ev
+                JOIN Utilisateurs u ON ev.utilisateur_id = u.id
+                WHERE ev.entreprise_id = ?
+                ORDER BY ev.id DESC";
+                
         $stmt = $this->db->prepare($sql);
         $stmt->bind_param("i", $entrepriseId);
         $stmt->execute();
@@ -157,5 +157,42 @@ class EntrepriseModel {
         }
         
         return $evaluations;
+    }
+    
+    public function getOffresEntreprise($entrepriseId) {
+        $sql = "SELECT o.*, 
+                COUNT(c.id) as nombre_candidatures 
+                FROM Offres o 
+                LEFT JOIN Candidatures c ON o.id = c.offre_id
+                WHERE o.entreprise_id = ?
+                GROUP BY o.id
+                ORDER BY o.date_debut DESC";
+                
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("i", $entrepriseId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        $offres = [];
+        while ($row = $result->fetch_assoc()) {
+            $offres[] = $row;
+        }
+        
+        return $offres;
+    }
+    
+    public function getTotalCandidaturesEntreprise($entrepriseId) {
+        $sql = "SELECT COUNT(c.id) as total_candidatures
+                FROM Candidatures c
+                JOIN Offres o ON c.offre_id = o.id
+                WHERE o.entreprise_id = ?";
+                
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("i", $entrepriseId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        
+        return $row ? $row['total_candidatures'] : 0;
     }
 }

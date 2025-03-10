@@ -1,40 +1,7 @@
 <?php
-$pageTitle = "Détails de l'offre - StageLink";
-require_once 'config.php';
+// Les données de l'offre sont maintenant fournies par le contrôleur
+// et ne sont plus récupérées directement dans la vue
 include('header.php');
-
-// Vérifier si l'ID est fourni
-if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-    header('Location: offres.php');
-    exit;
-}
-
-$id = (int)$_GET['id'];
-
-// Récupérer les détails de l'offre avec les informations de l'entreprise et le nombre de candidatures
-$sql = "SELECT o.*, 
-        e.nom AS entreprise_nom, 
-        e.email AS entreprise_email,
-        e.telephone AS entreprise_telephone,
-        COUNT(c.id) as nombre_candidatures,
-        GROUP_CONCAT(DISTINCT comp.nom SEPARATOR ', ') as competences
-        FROM Offres o
-        JOIN Entreprises e ON o.entreprise_id = e.id
-        LEFT JOIN Candidatures c ON o.id = c.offre_id
-        LEFT JOIN Offres_Competences oc ON o.id = oc.offre_id
-        LEFT JOIN Competences comp ON oc.competence_id = comp.id
-        WHERE o.id = ?
-        GROUP BY o.id";
-
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $id);
-$stmt->execute();
-$offre = $stmt->get_result()->fetch_assoc();
-
-if (!$offre) {
-    header('Location: offres.php');
-    exit;
-}
 ?>
 
 <head>
@@ -62,12 +29,12 @@ if (!$offre) {
             <p><?= nl2br(htmlspecialchars($offre['description'])) ?></p>
         </div>
 
-        <?php if(!empty($offre['competences'])): ?>
+        <?php if(!empty($competences)): ?>
         <div class="offre-section">
             <h3>Compétences requises</h3>
             <div class="competences">
-                <?php foreach(explode(', ', $offre['competences']) as $competence): ?>
-                    <span class="competence-tag"><?= htmlspecialchars($competence) ?></span>
+                <?php foreach($competences as $competence): ?>
+                    <span class="competence-tag"><?= htmlspecialchars($competence['nom']) ?></span>
                 <?php endforeach; ?>
             </div>
         </div>

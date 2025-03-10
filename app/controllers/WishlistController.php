@@ -16,25 +16,65 @@ class WishlistController extends Controller {
         }
         
         if (!isset($_SESSION['user_id'])) {
-            $this->redirect('login');
+            http_response_code(401);
+            echo json_encode(['success' => false, 'message' => 'Non connecté']);
+            return;
         }
         
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Récupérer l'ID de l'offre
-            $offreId = isset($_POST['offre_id']) ? (int)$_POST['offre_id'] : 0;
+        // Vérifier si l'offre_id est fourni
+        if (!isset($_POST['offre_id'])) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'ID de l\'offre manquant']);
+            return;
+        }
+        
+        $utilisateur_id = $_SESSION['user_id'];
+        $offre_id = (int)$_POST['offre_id'];
+        
+        try {
+            // Commencer une transaction
+            $db = Database::getInstance()->getConnection();
+            $db->begin_transaction();
             
-            if ($offreId > 0) {
-                // Ajouter/supprimer l'offre de la wishlist
-                $this->offreModel->toggleLike($offreId, $_SESSION['user_id']);
+            // Vérifier si le like existe déjà
+            $stmt = $db->prepare("SELECT 1 FROM WishList WHERE utilisateur_id = ? AND offre_id = ?");
+            $stmt->bind_param("ii", $utilisateur_id, $offre_id);
+            $stmt->execute();
+            $exists = $stmt->get_result()->num_rows > 0;
+            
+            if ($exists) {
+                // Supprimer le like s'il existe
+                $stmt = $db->prepare("DELETE FROM WishList WHERE utilisateur_id = ? AND offre_id = ?");
+                $stmt->bind_param("ii", $utilisateur_id, $offre_id);
+                $stmt->execute();
+            } else {
+                // Ajouter le like s'il n'existe pas
+                $stmt = $db->prepare("INSERT INTO WishList (utilisateur_id, offre_id) VALUES (?, ?)");
+                $stmt->bind_param("ii", $utilisateur_id, $offre_id);
+                $stmt->execute();
             }
             
-            // Rediriger vers la page précédente ou la liste des offres
-            $referer = $_SERVER['HTTP_REFERER'] ?? 'index.php?route=offres';
-            header('Location: ' . $referer);
-            exit();
-        } else {
-            // Rediriger vers la liste des offres si ce n'est pas une requête POST
-            $this->redirect('offres');
+            // Valider la transaction
+            $db->commit();
+            
+            // Envoyer la réponse JSON
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'action' => $exists ? 'removed' : 'added'
+            ]);
+            
+        } catch (Exception $e) {
+            // En cas d'erreur, annuler la transaction
+            if (isset($db)) {
+                $db->rollback();
+            }
+            
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Une erreur est survenue: ' . $e->getMessage()
+            ]);
         }
     }
     
