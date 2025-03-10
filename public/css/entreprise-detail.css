@@ -1,0 +1,116 @@
+.entreprise-details {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.entreprise-info-details {
+  background: var(--couleur-container);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.statistiques {
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+}
+
+.offres-entreprise {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.offres-entreprise h2 {
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+}
+
+.offre {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.offre h3 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.offre .description {
+  margin-bottom: 1rem;
+}
+
+.offre-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.voir-plus {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-color);
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.voir-plus:hover {
+  background-color: var(--primary-dark);
+}
+.navbar {
+  display: flex;
+  justify-content: left;
+  width: auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.centre {
+  display: flex;
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  background: none;
+  border: none;
+  font: inherit;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.texte {
+  font-size: var(--taille-texte);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+h2 {
+  font-size: 28px;
+  text-align: center;
+  font-weight: 500;
+  width: 100%;
+}
+
+.entreprise-info-details h2,
+.offres-entreprise h2 {
+  width: fit-content;
+  font-size: 24px;
+}
