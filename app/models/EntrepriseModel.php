@@ -6,6 +6,48 @@ class EntrepriseModel {
         require_once ROOT_PATH . '/app/models/Database.php';
         $this->db = Database::getInstance();
     }
+    /**
+ * Compte le nombre total d'entreprises
+ */
+    public function countAllEntreprises() {
+        $sql = "SELECT COUNT(*) as total FROM Entreprises";
+        $result = $this->db->query($sql);
+        $row = $result->fetch_assoc();
+        return $row['total'];
+    }
+
+/**
+ * Récupère une liste paginée d'entreprises avec leurs évaluations
+ */
+    public function getEntreprisesWithPaginationAndRatings($limit, $offset, $userId = null) {
+        $sql = "SELECT e.*, 
+                COALESCE(AVG(ev.note), 0) as note_moyenne,
+                COUNT(ev.id) as nombre_avis,
+                user_eval.note as user_note
+                FROM Entreprises e
+                LEFT JOIN Evaluations ev ON e.id = ev.entreprise_id
+                LEFT JOIN (
+                    SELECT entreprise_id, note 
+                    FROM Evaluations 
+                    WHERE utilisateur_id = ?
+                ) user_eval ON e.id = user_eval.entreprise_id
+                GROUP BY e.id
+                ORDER BY e.nom
+                LIMIT ?, ?";
+    
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("iii", $userId, $offset, $limit);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    
+        $entreprises = [];
+        while ($row = $result->fetch_assoc()) {
+            $entreprises[] = $row;
+        }
+    
+        return $entreprises;
+    }
+
     
     public function getAllEntreprises() {
         $sql = "SELECT * FROM Entreprises ORDER BY nom";

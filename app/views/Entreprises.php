@@ -5,6 +5,7 @@ include('header.php');
 <head>
     <link rel="stylesheet" href="public/css/entreprises.css">
     <link rel="stylesheet" href="public/css/variable.css">
+    <link rel="stylesheet" href="public/css/pagination.css">
     <link rel="icon" href="public/images/favicon.svg" type="image/svg" />
 </head>
 
@@ -52,5 +53,12 @@ include('header.php');
 </div>
 
 <script src="public/js/search.js"></script>
+
+<?php if (isset($pagination) && !empty($entreprises)): ?>
+    <div class="pagination-container">
+        <?= $pagination ?>
+    </div>
+<?php endif; ?>
+
 
 <?php include('footer.php'); ?>

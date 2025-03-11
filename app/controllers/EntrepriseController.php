@@ -1,6 +1,8 @@
 <?php
 require_once ROOT_PATH . '/app/controllers/Controller.php';
 require_once ROOT_PATH . '/app/models/EntrepriseModel.php';
+require_once ROOT_PATH . '/app/utils/Pagination.php';
+
 
 class EntrepriseController extends Controller {
     private $entrepriseModel;
@@ -12,14 +14,33 @@ class EntrepriseController extends Controller {
     public function index() {
         $this->checkPageAccess('VOIR_ENTREPRISE');
         
+        // Récupérer le numéro de page depuis l'URL
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        
+        // Nombre total d'entreprises
+        $totalEntreprises = $this->entrepriseModel->countAllEntreprises();
+        
+        // Créer l'objet pagination (12 entreprises par page)
+        $pagination = new Pagination($totalEntreprises, 12, $page);
+        
+        // Récupérer les entreprises pour la page actuelle avec leurs évaluations
         $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
-        $entreprises = $this->entrepriseModel->getAllEntreprisesWithRatings($userId);
+        $entreprises = $this->entrepriseModel->getEntreprisesWithPaginationAndRatings(
+            $pagination->getLimit(), 
+            $pagination->getOffset(),
+            $userId
+        );
+        
+        // URL de base pour les liens de pagination
+        $baseUrl = 'index.php?route=entreprises';
         
         echo $this->render('Entreprises', [
             'pageTitle' => 'Entreprises - StageLink',
-            'entreprises' => $entreprises
+            'entreprises' => $entreprises,
+            'pagination' => $pagination->renderHtml($baseUrl)
         ]);
     }
+    
     
     public function details() {
         $this->checkPageAccess('VOIR_ENTREPRISE');
