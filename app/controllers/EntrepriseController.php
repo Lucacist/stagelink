@@ -112,16 +112,21 @@ class EntrepriseController extends Controller {
     }
     
     public function rate() {
-        $this->checkPageAccess('NOTER_ENTREPRISE');
+        $this->checkPageAccess('EVALUER_ENTREPRISE');
         
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('entreprises');
             return;
         }
         
+        // Débogage - Enregistrer les données reçues
+        $debug = "Données reçues: \n";
+        $debug .= "POST: " . print_r($_POST, true) . "\n";
+        $debug .= "SESSION: " . print_r($_SESSION, true) . "\n";
+        file_put_contents(ROOT_PATH . '/debug_rating.log', $debug, FILE_APPEND);
+        
         $entrepriseId = isset($_POST['entreprise_id']) ? (int)$_POST['entreprise_id'] : 0;
         $note = isset($_POST['note']) ? (int)$_POST['note'] : 0;
-        $commentaire = trim($_POST['commentaire'] ?? '');
         $userId = $_SESSION['user_id'];
         
         if ($entrepriseId <= 0 || $note < 1 || $note > 5) {
@@ -130,7 +135,13 @@ class EntrepriseController extends Controller {
             return;
         }
         
-        $success = $this->entrepriseModel->rateEntreprise($entrepriseId, $userId, $note, $commentaire);
+        $success = $this->entrepriseModel->rateEntreprise($entrepriseId, $userId, $note);
+        
+        // Débogage - Enregistrer le résultat
+        $debug = "Résultat de rateEntreprise: \n";
+        $debug .= "Success: " . ($success ? 'true' : 'false') . "\n";
+        $debug .= "entrepriseId: $entrepriseId, userId: $userId, note: $note\n";
+        file_put_contents(ROOT_PATH . '/debug_rating.log', $debug, FILE_APPEND);
         
         if ($success) {
             $_SESSION['success_message'] = "Votre évaluation a été enregistrée avec succès.";

@@ -64,7 +64,8 @@ class EntrepriseModel {
     public function getEntrepriseWithRatingsById($id, $userId = null) {
         $sql = "SELECT e.*, 
                 COALESCE(AVG(ev.note), 0) as note_moyenne,
-                COUNT(ev.id) as nombre_avis,
+                COUNT(ev.id) as nombre_evaluations,
+                user_eval.note IS NOT NULL as user_has_rated,
                 user_eval.note as user_note
                 FROM Entreprises e
                 LEFT JOIN Evaluations ev ON e.id = ev.entreprise_id
@@ -112,27 +113,75 @@ class EntrepriseModel {
         return $stmt->execute();
     }
     
-    public function rateEntreprise($entrepriseId, $userId, $note, $commentaire) {
-        $sql = "SELECT id FROM Notes WHERE entreprise_id = ? AND utilisateur_id = ?";
+    public function rateEntreprise($entrepriseId, $userId, $note) {
+        // Débogage - Début de la méthode
+        $debug = "Début rateEntreprise: \n";
+        $debug .= "entrepriseId: $entrepriseId, userId: $userId, note: $note\n";
+        file_put_contents(ROOT_PATH . '/debug_model.log', $debug, FILE_APPEND);
+        
+        $sql = "SELECT id FROM Evaluations WHERE entreprise_id = ? AND utilisateur_id = ?";
         $stmt = $this->db->prepare($sql);
+        
+        if (!$stmt) {
+            $debug = "Erreur préparation SELECT: " . $this->db->error . "\n";
+            file_put_contents(ROOT_PATH . '/debug_model.log', $debug, FILE_APPEND);
+            return false;
+        }
+        
         $stmt->bind_param("ii", $entrepriseId, $userId);
-        $stmt->execute();
+        $result = $stmt->execute();
+        
+        if (!$result) {
+            $debug = "Erreur exécution SELECT: " . $stmt->error . "\n";
+            file_put_contents(ROOT_PATH . '/debug_model.log', $debug, FILE_APPEND);
+            return false;
+        }
+        
         $result = $stmt->get_result();
         
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $noteId = $row['id'];
             
-            $sql = "UPDATE Notes SET note = ?, commentaire = ?, date_modification = NOW() WHERE id = ?";
+            $debug = "Évaluation existante trouvée avec ID: $noteId\n";
+            file_put_contents(ROOT_PATH . '/debug_model.log', $debug, FILE_APPEND);
+            
+            $sql = "UPDATE Evaluations SET note = ? WHERE id = ?";
             $stmt = $this->db->prepare($sql);
-            $stmt->bind_param("isi", $note, $commentaire, $noteId);
-            return $stmt->execute();
+            
+            if (!$stmt) {
+                $debug = "Erreur préparation UPDATE: " . $this->db->error . "\n";
+                file_put_contents(ROOT_PATH . '/debug_model.log', $debug, FILE_APPEND);
+                return false;
+            }
+            
+            $stmt->bind_param("ii", $note, $noteId);
+            $result = $stmt->execute();
+            
+            $debug = "Résultat UPDATE: " . ($result ? "Succès" : "Échec: " . $stmt->error) . "\n";
+            file_put_contents(ROOT_PATH . '/debug_model.log', $debug, FILE_APPEND);
+            
+            return $result;
         } else {
-            $sql = "INSERT INTO Notes (entreprise_id, utilisateur_id, note, commentaire, date_creation) 
-                    VALUES (?, ?, ?, ?, NOW())";
+            $debug = "Aucune évaluation existante, création d'une nouvelle\n";
+            file_put_contents(ROOT_PATH . '/debug_model.log', $debug, FILE_APPEND);
+            
+            $sql = "INSERT INTO Evaluations (entreprise_id, utilisateur_id, note) VALUES (?, ?, ?)";
             $stmt = $this->db->prepare($sql);
-            $stmt->bind_param("iiss", $entrepriseId, $userId, $note, $commentaire);
-            return $stmt->execute();
+            
+            if (!$stmt) {
+                $debug = "Erreur préparation INSERT: " . $this->db->error . "\n";
+                file_put_contents(ROOT_PATH . '/debug_model.log', $debug, FILE_APPEND);
+                return false;
+            }
+            
+            $stmt->bind_param("iii", $entrepriseId, $userId, $note);
+            $result = $stmt->execute();
+            
+            $debug = "Résultat INSERT: " . ($result ? "Succès" : "Échec: " . $stmt->error) . "\n";
+            file_put_contents(ROOT_PATH . '/debug_model.log', $debug, FILE_APPEND);
+            
+            return $result;
         }
     }
     
