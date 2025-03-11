@@ -5,6 +5,7 @@ include('header.php');
 <head>
     <link rel="stylesheet" href="public/css/offres.css">
     <link rel="stylesheet" href="public/css/variable.css">
+    <link rel="stylesheet" href="public/css/pagination.css">
     <link rel="icon" href="public/images/favicon.svg" type="image/svg" />
 </head>
 
@@ -15,7 +16,7 @@ include('header.php');
         <div class="message">Aucune offre de stage disponible pour le moment.</div>
     <?php else: ?>
         <div class="offres-container">
-            <?php foreach ($offres as $offre): ?>
+        <?php foreach ($offres as $offre): ?>
                 <a href="index.php?route=offre_details&id=<?= $offre['id'] ?>" class="offre-link">
                     <div class="container">
                         <div class="offre-title">
@@ -70,6 +71,11 @@ include('header.php');
                 </a>
             <?php endforeach; ?>
         </div>
+        
+        <!-- Affichage de la pagination -->
+        <?php if (isset($pagination)): ?>
+            <?= $pagination ?>
+        <?php endif; ?>
     <?php endif; ?>
 </div>
 

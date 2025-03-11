@@ -15,11 +15,26 @@ class OffreController extends Controller {
     public function index() {
         $this->checkPageAccess('VOIR_OFFRE');
         
-        $offres = $this->offreModel->getAllOffres();
+        // Inclure la classe Pagination
+        require_once ROOT_PATH . '/app/utils/Pagination.php';
         
+        // Récupérer le numéro de page depuis l'URL
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        
+        // Nombre total d'offres
+        $totalOffres = $this->offreModel->countAllOffres();
+        
+        // Créer l'objet pagination (10 offres par page)
+        $pagination = new Pagination($totalOffres, 10, $page);
+        
+        // Récupérer les offres pour la page actuelle
+        $offres = $this->offreModel->getOffresWithPagination(
+            $pagination->getLimit(), 
+            $pagination->getOffset()
+        );
+        
+        // Ajouter les détails supplémentaires (compétences, likes)
         foreach ($offres as &$offre) {
-            $offre['competences'] = $this->offreModel->getOffreCompetences($offre['id']);
-            
             if (isset($_SESSION['user_id'])) {
                 $offre['isLiked'] = $this->offreModel->isOffreLiked($offre['id'], $_SESSION['user_id']);
             } else {
@@ -27,11 +42,16 @@ class OffreController extends Controller {
             }
         }
         
+        // URL de base pour les liens de pagination
+        $baseUrl = 'index.php?route=offres';
+        
         echo $this->render('offres', [
             'pageTitle' => 'Offres de stage - StageLink',
-            'offres' => $offres
+            'offres' => $offres,
+            'pagination' => $pagination->renderHtml($baseUrl)
         ]);
     }
+    
     
     public function details() {
         $this->checkPageAccess('VOIR_OFFRE');
