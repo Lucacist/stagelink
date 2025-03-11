@@ -96,116 +96,22 @@ include('header.php');
                     <input type="hidden" name="entreprise_id" value="<?= $entreprise['id'] ?>">
                     <input type="hidden" name="note" id="selected-rating" value="">
                     
-                    <div style="margin-bottom: 20px;">
-                        <p style="margin-bottom: 10px;">Votre note :</p>
+                    <div>
+                        <p>Votre note :</p>
                         <div class="star-rating">
                             <span class="star" data-value="1">★</span>
                             <span class="star" data-value="2">★</span>
                             <span class="star" data-value="3">★</span>
                             <span class="star" data-value="4">★</span>
                             <span class="star" data-value="5">★</span>
-                            <span id="rating-text" style="margin-left: 10px; font-size: 14px;"></span>
+                            <span id="rating-text"></span>
                         </div>
                     </div>
                     
-                    <button type="submit" id="submit-rating" style="display: block; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                    <button type="submit" id="submit-rating">
                         Envoyer votre note
                     </button>
                 </form>
-                
-                <style>
-                    .star-rating {
-                        display: flex;
-                        align-items: center;
-                    }
-                    .star {
-                        font-size: 30px;
-                        color: #ddd;
-                        cursor: pointer;
-                        transition: color 0.2s;
-                    }
-                    .star.active {
-                        color: #FFD700;
-                    }
-                    #submit-rating {
-                        opacity: 0.5;
-                        pointer-events: none;
-                    }
-                    #submit-rating.active {
-                        opacity: 1;
-                        pointer-events: auto;
-                    }
-                </style>
-                
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        const stars = document.querySelectorAll('.star');
-                        const ratingInput = document.getElementById('selected-rating');
-                        const submitButton = document.getElementById('submit-rating');
-                        const ratingText = document.getElementById('rating-text');
-                        const ratingLabels = ['Très mauvais', 'Mauvais', 'Moyen', 'Bon', 'Excellent'];
-                        
-                        // Désactiver le bouton d'envoi jusqu'à ce qu'une note soit sélectionnée
-                        submitButton.classList.remove('active');
-                        
-                        stars.forEach((star, index) => {
-                            star.addEventListener('mouseover', function() {
-                                // Effet de survol
-                                for (let i = 0; i <= index; i++) {
-                                    stars[i].classList.add('active');
-                                }
-                                for (let i = index + 1; i < stars.length; i++) {
-                                    stars[i].classList.remove('active');
-                                }
-                                ratingText.textContent = ratingLabels[index];
-                            });
-                            
-                            star.addEventListener('mouseout', function() {
-                                // Rétablir l'affichage si aucune note n'est sélectionnée
-                                if (!ratingInput.value) {
-                                    stars.forEach(s => s.classList.remove('active'));
-                                    ratingText.textContent = '';
-                                } else {
-                                    // Sinon, afficher la note sélectionnée
-                                    const selectedIndex = parseInt(ratingInput.value) - 1;
-                                    for (let i = 0; i <= selectedIndex; i++) {
-                                        stars[i].classList.add('active');
-                                    }
-                                    for (let i = selectedIndex + 1; i < stars.length; i++) {
-                                        stars[i].classList.remove('active');
-                                    }
-                                    ratingText.textContent = ratingLabels[selectedIndex];
-                                }
-                            });
-                            
-                            star.addEventListener('click', function() {
-                                const value = this.getAttribute('data-value');
-                                ratingInput.value = value;
-                                
-                                // Activer le bouton d'envoi
-                                submitButton.classList.add('active');
-                                
-                                // Mettre à jour l'affichage des étoiles
-                                for (let i = 0; i <= index; i++) {
-                                    stars[i].classList.add('active');
-                                }
-                                for (let i = index + 1; i < stars.length; i++) {
-                                    stars[i].classList.remove('active');
-                                }
-                                
-                                ratingText.textContent = ratingLabels[index];
-                            });
-                        });
-                        
-                        // Validation du formulaire
-                        document.getElementById('rating-form').addEventListener('submit', function(e) {
-                            if (!ratingInput.value) {
-                                e.preventDefault();
-                                alert('Veuillez sélectionner une note avant d\'envoyer.');
-                            }
-                        });
-                    });
-                </script>
             </div>
             <?php endif; ?>
             
@@ -240,5 +146,7 @@ include('header.php');
         </div>
     </div>
 </div>
+
+<script src="public/js/notation.js"></script>
 
 <?php include('footer.php'); ?>

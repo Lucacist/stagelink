@@ -73,7 +73,7 @@ include('header.php');
     <?php endif; ?>
 </div>
 
-<script src="public/js/notation.js"></script>
+<script src="public/js/search.js"></script>
 <script src="public/js/wishlist.js"></script>
 
 <?php include('footer.php'); ?>

@@ -111,44 +111,39 @@ class EntrepriseController extends Controller {
         $this->redirect('dashboard');
     }
     
-    public function rate() {
-        $this->checkPageAccess('EVALUER_ENTREPRISE');
-        
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->redirect('entreprises');
-            return;
+    /**
+     * Traite la soumission d'une note pour une entreprise
+     */
+    public function rate()
+    {
+        // Vérifier si l'utilisateur est connecté
+        if (!isset($_SESSION['user_id'])) {
+            $_SESSION['error_message'] = "Vous devez être connecté pour noter une entreprise.";
+            header('Location: index.php?route=login');
+            exit;
         }
-        
-        // Débogage - Enregistrer les données reçues
-        $debug = "Données reçues: \n";
-        $debug .= "POST: " . print_r($_POST, true) . "\n";
-        $debug .= "SESSION: " . print_r($_SESSION, true) . "\n";
-        file_put_contents(ROOT_PATH . '/debug_rating.log', $debug, FILE_APPEND);
-        
-        $entrepriseId = isset($_POST['entreprise_id']) ? (int)$_POST['entreprise_id'] : 0;
-        $note = isset($_POST['note']) ? (int)$_POST['note'] : 0;
-        $userId = $_SESSION['user_id'];
+
+        // Récupérer et valider les données
+        $entrepriseId = isset($_POST['entreprise_id']) ? intval($_POST['entreprise_id']) : 0;
+        $note = isset($_POST['note']) ? intval($_POST['note']) : 0;
         
         if ($entrepriseId <= 0 || $note < 1 || $note > 5) {
             $_SESSION['error_message'] = "Données invalides pour l'évaluation.";
-            $this->redirect('entreprise_details&id=' . $entrepriseId);
-            return;
+            header('Location: index.php?route=entreprise_details&id=' . $entrepriseId);
+            exit;
         }
+
+        // Enregistrer la note
+        $result = $this->entrepriseModel->rateEntreprise($entrepriseId, $_SESSION['user_id'], $note);
         
-        $success = $this->entrepriseModel->rateEntreprise($entrepriseId, $userId, $note);
-        
-        // Débogage - Enregistrer le résultat
-        $debug = "Résultat de rateEntreprise: \n";
-        $debug .= "Success: " . ($success ? 'true' : 'false') . "\n";
-        $debug .= "entrepriseId: $entrepriseId, userId: $userId, note: $note\n";
-        file_put_contents(ROOT_PATH . '/debug_rating.log', $debug, FILE_APPEND);
-        
-        if ($success) {
-            $_SESSION['success_message'] = "Votre évaluation a été enregistrée avec succès.";
+        if ($result) {
+            $_SESSION['success_message'] = "Votre note a été enregistrée avec succès.";
         } else {
-            $_SESSION['error_message'] = "Une erreur est survenue lors de l'enregistrement de votre évaluation.";
+            $_SESSION['error_message'] = "Une erreur est survenue lors de l'enregistrement de votre note.";
         }
-        
-        $this->redirect('entreprise_details&id=' . $entrepriseId);
+
+        // Rediriger vers la page de détails de l'entreprise
+        header('Location: index.php?route=entreprise_details&id=' . $entrepriseId);
+        exit;
     }
 }

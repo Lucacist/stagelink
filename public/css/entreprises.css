@@ -1,7 +1,17 @@
-.container {
-  background-color: var(--couleur-container);
+.contenu {
+  max-width: 1200px;
+  margin: auto;
   display: flex;
   flex-direction: column;
+  gap: 20px;
+}
+.entreprises-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.container {
+  background-color: var(--couleur-container);
   gap: 20px;
   width: auto;
   padding: 40px;

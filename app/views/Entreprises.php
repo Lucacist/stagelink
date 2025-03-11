@@ -1,15 +1,5 @@
 <?php
-// Les inclusions suivantes sont gérées par le contrôleur
-// require_once 'config.php';
-// require_once 'utils/permissions.php';
-
-// Les vérifications d'accès sont maintenant gérées par le contrôleur
-// checkPageAccess('VOIR_ENTREPRISE');
-
 include('header.php');
-
-// Les entreprises sont maintenant passées directement par le contrôleur via le paramètre $entreprises
-// Les notes et autres données sont maintenant gérées par le contrôleur
 ?>
 
 <head>
@@ -24,7 +14,7 @@ include('header.php');
     <?php if (empty($entreprises)): ?>
         <div class="message">Aucune entreprise disponible pour le moment.</div>
     <?php else: ?>
-        <div class="entreprises-container">
+    div class="entreprises-container">
             <?php foreach ($entreprises as $entreprise): ?>
                 <a href="index.php?route=entreprise_details&id=<?= $entreprise['id'] ?>" class="entreprise-link">
                     <div class="container">
@@ -41,7 +31,7 @@ include('header.php');
                                         <span class="etoile <?= $i <= round($entreprise['note_moyenne']) ? 'active' : '' ?>">★</span>
                                     <?php endfor; ?>
                                 </div>
-                                <div class="nombre-avis">(<?= $entreprise['nombre_avis'] ?> avis)</div>
+                            div class="nombre-avis">(<?= $entreprise['nombre_avis'] ?> avis)</div>
                             </div>
                             
                             <?php if (isset($entreprise['secteur'])): ?>
@@ -55,6 +45,6 @@ include('header.php');
     <?php endif; ?>
 </div>
 
-<script src="public/js/notation.js"></script>
+<script src="public/js/search.js"></script>
 
 <?php include('footer.php'); ?>

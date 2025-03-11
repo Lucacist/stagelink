@@ -1,9 +1,7 @@
-/* Styles généraux pour la page détails d'entreprise */
 .entreprise-details {
   max-width: 1200px;
   margin: 2rem auto;
   padding: 0 1rem;
-  font-family: var(--famille-police);
 }
 
 .centre {
@@ -15,14 +13,10 @@
 .navbar {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
-  border-radius: 4px;
-  transition: background-color 0.3s;
-}
-
-.navbar:hover {
-  background-color: var(--couleur-hover);
+  gap: 0.5rem;
+  text-decoration: none;
+  color: inherit;
+  width: fit-content;
 }
 
 .navbar svg {
@@ -59,7 +53,7 @@
   background-color: var(--couleur-container);
   border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--couleur-bordure-container);
 }
 
 /* Système de notation */
@@ -81,7 +75,7 @@
 }
 
 .star.full {
-  color: var(--couleur-avis);
+  color: var(--couleur-orange);
 }
 
 .star.half {
@@ -112,7 +106,8 @@
   background-color: var(--couleur-container);
   border-radius: 8px;
   padding: 25px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--couleur-bordure-container);
+
 }
 
 .entreprise-section h2 {
@@ -273,10 +268,50 @@
   color: var(--couleur-avis);
 }
 
+.star-rating {
+  display: flex;
+  align-items: center;
+}
+
+.star {
+  font-size: 30px;
+  color: #ddd;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.star.active {
+  color: var(--couleur-orange);
+}
+
+#rating-text {
+  margin-left: 10px;
+  font-size: 14px;
+}
+
+#submit-rating {
+  display: block;
+  padding: 10px 20px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+#submit-rating.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .btn-submit {
   align-self: flex-start;
   padding: 10px 20px;
-  background-color: var(--primary-color);
+  background-color: transparent;
+  border: 1px solid var(--couleur-button);
   color: white;
   border: none;
   border-radius: 4px;
@@ -286,7 +321,8 @@
 }
 
 .btn-submit:hover {
-  background-color: var(--primary-dark);
+  background-color: transparent;
+  border: 1px solid var(--couleur-button);
 }
 
 /* Nouvelle section de distribution des notes */
