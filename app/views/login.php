@@ -1,12 +1,5 @@
 <?php
-// Les inclusions suivantes ne sont plus nécessaires car elles sont gérées par le contrôleur
-// require_once 'config.php';
-// require_once 'utils/permissions.php';
-
-// Variable pour le message (sera fournie par le contrôleur)
 $error = $error ?? "";
-
-// La logique de connexion a été déplacée dans le contrôleur AuthController
 ?>
 
 <!DOCTYPE html>
@@ -30,7 +23,6 @@ $error = $error ?? "";
                 Retrouvez toutes vos offres et candidatures en vous connectant :
             </div>
 
-            <!-- Bloc de message pour afficher les erreurs -->
             <?php if (!empty($error)): ?>
             <div class="message"><?php echo $error; ?></div>
             <?php endif; ?>

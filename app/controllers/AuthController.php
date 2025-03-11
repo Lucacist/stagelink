@@ -10,7 +10,6 @@ class AuthController extends Controller {
     }
     
     public function login() {
-        // Si l'utilisateur est déjà connecté, rediriger vers l'accueil
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
@@ -19,7 +18,6 @@ class AuthController extends Controller {
             $this->redirect('accueil');
         }
         
-        // Traitement du formulaire de connexion
         $error = '';
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = $_POST['email'] ?? '';
@@ -32,11 +30,9 @@ class AuthController extends Controller {
                 $_SESSION['user_nom'] = $user['nom'];
                 $_SESSION['user_prenom'] = $user['prenom'];
                 
-                // Récupérer le rôle et les permissions
                 $role = $this->utilisateurModel->getUserRole($user['id']);
                 $_SESSION['user_role'] = $role['role_code'];
                 
-                // Récupérer et enregistrer les permissions de l'utilisateur
                 $_SESSION['permissions'] = $this->utilisateurModel->getUserPermissions($user['id']);
                 
                 $this->redirect('accueil');
@@ -45,7 +41,6 @@ class AuthController extends Controller {
             }
         }
         
-        // Affichage du formulaire de connexion
         echo $this->render('login', [
             'error' => $error,
             'pageTitle' => 'Connexion - StageLink'
@@ -57,10 +52,8 @@ class AuthController extends Controller {
             session_start();
         }
         
-        // Détruire toutes les données de session
         $_SESSION = [];
         
-        // Détruire le cookie de session
         if (ini_get("session.use_cookies")) {
             $params = session_get_cookie_params();
             setcookie(session_name(), '', time() - 42000,
@@ -69,10 +62,8 @@ class AuthController extends Controller {
             );
         }
         
-        // Détruire la session
         session_destroy();
         
-        // Rediriger vers la page de connexion
         $this->redirect('login');
     }
 }

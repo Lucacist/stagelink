@@ -4,16 +4,13 @@ class Database {
     private $conn;
     
     private function __construct() {
-        // Paramètres de connexion à la base de données
         $servername = "localhost";
         $username = "root";
         $password = "";
         $dbname = "StageLink";
         
-        // Création de la connexion
         $this->conn = new mysqli($servername, $username, $password, $dbname);
         
-        // Vérification de la connexion
         if ($this->conn->connect_error) {
             die("Échec de la connexion : " . $this->conn->connect_error);
         }
@@ -30,17 +27,14 @@ class Database {
         return $this->conn;
     }
     
-    // Méthode pour exécuter une requête directement
     public function query($sql) {
         return $this->conn->query($sql);
     }
     
-    // Méthode pour préparer une requête
     public function prepare($sql) {
         return $this->conn->prepare($sql);
     }
     
-    // Méthode pour obtenir l'ID de la dernière insertion
     public function getLastInsertId() {
         return $this->conn->insert_id;
     }

@@ -1,26 +1,4 @@
 <?php
-// Les vérifications d'authentification et de permissions sont maintenant gérées par le contrôleur
-// if (session_status() === PHP_SESSION_NONE) {
-//     session_start();
-// } else {
-//     // Session is already started
-// }
-// require_once 'config.php';
-// require_once 'utils/permissions.php';
-
-// // Vérifier que l'utilisateur est connecté
-// if (!isset($_SESSION['user_id'])) {
-//     header('Location: index.php?route=login');
-//     exit();
-// }
-
-// // Vérifier que l'utilisateur est admin ou pilote
-// if (!isset($_SESSION['user_role']) || ($_SESSION['user_role'] !== 'ADMIN' && $_SESSION['user_role'] !== 'PILOTE')) {
-//     header('Location: index.php?route=accueil');
-//     exit();
-// }
-
-$pageTitle = "Tableau de bord - StageLink";
 include('header.php');
 ?>
 

@@ -29,7 +29,6 @@ class UtilisateurModel {
         $result = $stmt->get_result();
         
         if ($row = $result->fetch_assoc()) {
-            // En développement : vérifier à la fois avec password_verify et en comparaison directe
             if (password_verify($password, $row['mot_de_passe']) || $password === $row['mot_de_passe']) {
                 return $row;
             }

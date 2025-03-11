@@ -1,17 +1,11 @@
 <?php
-// Les inclusions suivantes ne sont plus nécessaires car elles sont gérées par le contrôleur
-// require_once 'config.php';
-// require_once 'utils/permissions.php';
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Récupérer les informations de l'utilisateur
 $prenom = isset($_SESSION['prenom']) ? $_SESSION['prenom'] : 'Mon Compte';
 $roleNom = isset($_SESSION['role_nom']) ? $_SESSION['role_nom'] : 'Étudiant';
 
-// Détecter la page actuelle à partir de la route plutôt que du fichier PHP
 $route = isset($_GET['route']) ? $_GET['route'] : 'accueil';
 ?>
 
@@ -64,7 +58,6 @@ $route = isset($_GET['route']) ? $_GET['route'] : 'accueil';
                 <a href="index.php?route=entreprises" class="pages <?= (in_array($route, ['entreprises', 'entreprise_details'])) ? 'activer' : '' ?>">Entreprises</a>
 
                 <?php 
-                // Toujours afficher le dashboard pour les utilisateurs ayant un rôle Admin ou Pilote
                 if (isset($_SESSION['user_role']) && ($_SESSION['user_role'] === 'ADMIN' || $_SESSION['user_role'] === 'PILOTE')): 
                 ?>
                     <a href="index.php?route=dashboard" class="pages <?= ($route == 'dashboard') ? 'activer' : '' ?>">Dashboard</a>

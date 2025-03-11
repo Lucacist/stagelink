@@ -69,7 +69,7 @@ header .stagelink {
 header .stagelink-logo {
   font-family: "Gilroy-Bold";
   font-size: 28px;
-  color: #0A0A0A;
+  color: #0a0a0a;
   text-transform: uppercase;
 }
 .compte {
@@ -164,9 +164,28 @@ footer .titre {
   font-size: 20px;
   text-align: center;
 }
-.texte-footer {
+.texte-footer1,
+.texte-footer2,
+.texte-footer3,
+.texte-footer4 {
   font-size: 14px;
+  text-align: center;
+  border-radius: 3px;
+  margin-top: 5px;
 }
+.texte-footer1 {
+  background-color: var(--couleur-orange);
+}
+.texte-footer2 {
+  background-color: var(--couleur-rouge);
+}
+.texte-footer3 {
+  background-color: var(--couleur-rose);
+}
+.texte-footer4 {
+  background-color: var(--couleur-vert);
+}
+
 .foot-contain {
   display: flex;
   flex-direction: row;
@@ -212,7 +231,6 @@ footer a {
   font-size: 17px;
   margin-bottom: 5%;
 }
-
 
 .logo-text {
   color: var(--couleur-texte);

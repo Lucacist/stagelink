@@ -113,7 +113,6 @@ class EntrepriseModel {
     }
     
     public function rateEntreprise($entrepriseId, $userId, $note, $commentaire) {
-        // Vérifier si l'utilisateur a déjà noté cette entreprise
         $sql = "SELECT id FROM Notes WHERE entreprise_id = ? AND utilisateur_id = ?";
         $stmt = $this->db->prepare($sql);
         $stmt->bind_param("ii", $entrepriseId, $userId);
@@ -121,7 +120,6 @@ class EntrepriseModel {
         $result = $stmt->get_result();
         
         if ($result->num_rows > 0) {
-            // Mettre à jour la note existante
             $row = $result->fetch_assoc();
             $noteId = $row['id'];
             
@@ -130,7 +128,6 @@ class EntrepriseModel {
             $stmt->bind_param("isi", $note, $commentaire, $noteId);
             return $stmt->execute();
         } else {
-            // Créer une nouvelle note
             $sql = "INSERT INTO Notes (entreprise_id, utilisateur_id, note, commentaire, date_creation) 
                     VALUES (?, ?, ?, ?, NOW())";
             $stmt = $this->db->prepare($sql);

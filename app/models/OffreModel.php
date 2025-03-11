@@ -16,7 +16,6 @@ class OffreModel {
         
         $offres = [];
         while ($row = $result->fetch_assoc()) {
-            // Récupérer les compétences pour cette offre
             $row['competences'] = $this->getCompetencesForOffre($row['id']);
             $offres[] = $row;
         }
@@ -42,7 +41,6 @@ class OffreModel {
         $result = $stmt->get_result();
         
         if ($row = $result->fetch_assoc()) {
-            // Récupérer les compétences pour cette offre
             $row['competences'] = $this->getCompetencesForOffre($id);
             return $row;
         }
@@ -51,7 +49,6 @@ class OffreModel {
     }
     
     public function createOffre($entrepriseId, $titre, $description, $baseRemuneration, $dateDebut, $dateFin, $competences = []) {
-        // Insérer l'offre
         $sql = "INSERT INTO Offres (entreprise_id, titre, description, base_remuneration, date_debut, date_fin) 
                 VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $this->db->prepare($sql);
@@ -62,11 +59,9 @@ class OffreModel {
             return false;
         }
         
-        // Utiliser la nouvelle méthode pour obtenir l'ID d'insertion
         $offreId = $this->db->getLastInsertId();
         error_log("Offre créée avec l'ID: " . $offreId);
         
-        // Ajouter les compétences si fournies
         if (!empty($competences) && $offreId) {
             foreach ($competences as $competenceId) {
                 $this->addOffreCompetence($offreId, $competenceId);
@@ -76,7 +71,6 @@ class OffreModel {
         return $offreId;
     }
     
-    // Méthode pour ajouter une seule compétence à une offre
     public function addOffreCompetence($offreId, $competenceId) {
         $sql = "INSERT INTO Offres_Competences (offre_id, competence_id) VALUES (?, ?)";
         $stmt = $this->db->prepare($sql);
@@ -98,10 +92,8 @@ class OffreModel {
             return true;
         }
         
-        // Supprimer les anciennes compétences liées à cette offre
         $this->deleteOffreCompetences($offreId);
         
-        // Ajouter les nouvelles compétences
         $sql = "INSERT INTO Offres_Competences (offre_id, competence_id) VALUES (?, ?)";
         $stmt = $this->db->prepare($sql);
         
@@ -185,13 +177,11 @@ class OffreModel {
     
     public function toggleLike($offreId, $utilisateurId) {
         if ($this->isOffreLiked($offreId, $utilisateurId)) {
-            // Supprimer de la wishlist
             $sql = "DELETE FROM WishList WHERE offre_id = ? AND utilisateur_id = ?";
             $stmt = $this->db->prepare($sql);
             $stmt->bind_param("ii", $offreId, $utilisateurId);
             return $stmt->execute();
         } else {
-            // Ajouter à la wishlist
             $sql = "INSERT INTO WishList (offre_id, utilisateur_id) VALUES (?, ?)";
             $stmt = $this->db->prepare($sql);
             $stmt->bind_param("ii", $offreId, $utilisateurId);

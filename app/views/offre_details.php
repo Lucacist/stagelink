@@ -1,6 +1,4 @@
 <?php
-// Les données de l'offre sont maintenant fournies par le contrôleur
-// et ne sont plus récupérées directement dans la vue
 include('header.php');
 ?>
 

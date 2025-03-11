@@ -1,5 +1,4 @@
 <?php
-// Le titre de la page est maintenant fourni par le contrôleur
 $pageTitle = $pageTitle ?? "Accueil - StageLink"; 
 include('header.php'); 
 ?>
