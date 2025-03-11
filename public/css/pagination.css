@@ -2,6 +2,9 @@
 .pagination-container {
     margin: 30px 0;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .pagination {
@@ -19,7 +22,7 @@
 
 .pagination-item {
     display: inline-block;
-    padding: 8px 16px;
+    padding: 8px 13px;
     border-radius: 4px;
     background-color: white;
     color: #333;
@@ -35,9 +38,10 @@
 }
 
 .pagination-item.active {
-    background-color: var(--primary-color, #4CAF50);
+    background-color: black;
     color: white;
-    border-color: var(--primary-color, #4CAF50);
+    border: none;
+    border-radius: 40px;
 }
 
 .pagination-item.disabled {
@@ -53,7 +57,6 @@
 }
 
 .pagination-info {
-    margin-top: 10px;
     color: #666;
     font-size: 0.9em;
 }

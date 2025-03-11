@@ -10,7 +10,7 @@ include('header.php');
 
 <div class="contenu">
     <h1>Entreprises</h1>
-    
+
     <?php if (empty($entreprises)): ?>
         <div class="message">Aucune entreprise disponible pour le moment.</div>
     <?php else: ?>
@@ -19,21 +19,27 @@ include('header.php');
                 <a href="index.php?route=entreprise_details&id=<?= $entreprise['id'] ?>" class="entreprise-link">
                     <div class="container">
                         <?php if (!empty($entreprise['logo'])): ?>
-                            <img src="public/images/entreprises/<?= htmlspecialchars($entreprise['logo']) ?>" alt="Logo <?= htmlspecialchars($entreprise['nom']) ?>" class="logo-entreprise">
+                            <img src="public/images/entreprises/<?= htmlspecialchars($entreprise['logo']) ?>"
+                                alt="Logo <?= htmlspecialchars($entreprise['nom']) ?>" class="logo-entreprise">
                         <?php endif; ?>
                         <div class="entreprise-info">
                             <h2><?= htmlspecialchars($entreprise['nom']) ?></h2>
-                            <div class="description"><?= substr(htmlspecialchars($entreprise['description']), 0, 200) . (strlen($entreprise['description']) > 200 ? '...' : '') ?></div>
-                            
-                            <div class="note-container">
-                                <div class="note">
-                                    <?php for ($i = 1; $i <= 5; $i++): ?>
-                                        <span class="etoile <?= $i <= round($entreprise['note_moyenne']) ? 'active' : '' ?>">★</span>
-                                    <?php endfor; ?>
+                            <div class="container-description">
+                                <div class="description">
+                                    <?= substr(htmlspecialchars($entreprise['description']), 0, 200) . (strlen($entreprise['description']) > 200 ? '...' : '') ?>
                                 </div>
-                                <div class="nombre-avis">(<?= $entreprise['nombre_avis'] ?> avis)</div>
+
+                                <div class="note-container">
+                                    <div class="note">
+                                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                                            <span
+                                                class="etoile <?= $i <= round($entreprise['note_moyenne']) ? 'active' : '' ?>">★</span>
+                                        <?php endfor; ?>
+                                    </div>
+                                    <div class="nombre-avis">(<?= $entreprise['nombre_avis'] ?> avis)</div>
+                                </div>
                             </div>
-                            
+
                             <?php if (isset($entreprise['secteur'])): ?>
                                 <div class="secteur"><?= htmlspecialchars($entreprise['secteur']) ?></div>
                             <?php endif; ?>

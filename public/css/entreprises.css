@@ -31,43 +31,9 @@ h2 {
   font-size: 24px;
 }
 
-.entreprises {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  width: 90vw;
-  max-width: 1220px;
-  margin: 40px auto 0 auto;
-}
-.rating {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  flex-wrap: nowrap;
-  width: fit-content;
-}
-
-.stars {
-  color: #ffd700;
-  font-size: 24px;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-}
-
-.star {
-  cursor: pointer;
-  transition: color 0.2s;
-  margin: 0 2px;
-}
-
-.star:hover {
-  color: #ffed4a;
-}
-
 .entreprise-info {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: column;
   gap: 30px;
 }
 .entreprise-info p {
@@ -80,4 +46,20 @@ h2 {
   text-decoration: none;
   color: inherit;
   display: block;
+}
+.note {
+  display: flex;
+  flex-wrap: nowrap;
+}
+.container-description {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+}
+.etoile.active {
+  color: var(--couleur-orange);
+}
+.etoile {
+  font-size: 1.5rem;
+
 }

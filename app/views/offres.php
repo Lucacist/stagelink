@@ -16,7 +16,7 @@ include('header.php');
         <div class="message">Aucune offre de stage disponible pour le moment.</div>
     <?php else: ?>
         <div class="offres-container">
-        <?php foreach ($offres as $offre): ?>
+            <?php foreach ($offres as $offre): ?>
                 <a href="index.php?route=offre_details&id=<?= $offre['id'] ?>" class="offre-link">
                     <div class="container">
                         <div class="offre-title">
@@ -71,7 +71,7 @@ include('header.php');
                 </a>
             <?php endforeach; ?>
         </div>
-        
+
         <!-- Affichage de la pagination -->
         <?php if (isset($pagination)): ?>
             <?= $pagination ?>
