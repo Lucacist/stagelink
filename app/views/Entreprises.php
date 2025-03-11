@@ -14,7 +14,7 @@ include('header.php');
     <?php if (empty($entreprises)): ?>
         <div class="message">Aucune entreprise disponible pour le moment.</div>
     <?php else: ?>
-    div class="entreprises-container">
+        <div class="entreprises-container">
             <?php foreach ($entreprises as $entreprise): ?>
                 <a href="index.php?route=entreprise_details&id=<?= $entreprise['id'] ?>" class="entreprise-link">
                     <div class="container">
@@ -31,7 +31,7 @@ include('header.php');
                                         <span class="etoile <?= $i <= round($entreprise['note_moyenne']) ? 'active' : '' ?>">★</span>
                                     <?php endfor; ?>
                                 </div>
-                            div class="nombre-avis">(<?= $entreprise['nombre_avis'] ?> avis)</div>
+                                <div class="nombre-avis">(<?= $entreprise['nombre_avis'] ?> avis)</div>
                             </div>
                             
                             <?php if (isset($entreprise['secteur'])): ?>
