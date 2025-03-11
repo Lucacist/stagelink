@@ -85,52 +85,156 @@ include('header.php');
         </div>
 
         <div class="entreprise-section avis-section">
-            <h2>Avis des étudiants</h2>
-            <?php if (isset($_SESSION['user_id']) && !isset($entreprise['user_has_rated'])): ?>
+            <h2>Notation de l'entreprise</h2>
+            
+            <?php if (isset($_SESSION['user_id'])): ?>
             <div class="add-avis">
-                <h3>Donnez votre avis</h3>
-                <form action="index.php?route=ajouter_evaluation" method="POST" class="avis-form">
+                <h3>Notez cette entreprise</h3>
+                
+                <!-- Système d'évaluation avec étoiles -->
+                <form action="index.php?route=rate_entreprise" method="POST" id="rating-form">
                     <input type="hidden" name="entreprise_id" value="<?= $entreprise['id'] ?>">
+                    <input type="hidden" name="note" id="selected-rating" value="">
                     
-                    <div class="rating-input">
-                        <p>Votre note :</p>
-                        <div class="stars-input">
-                            <?php for ($i = 5; $i >= 1; $i--): ?>
-                            <input type="radio" name="note" id="star<?= $i ?>" value="<?= $i ?>">
-                            <label for="star<?= $i ?>">★</label>
-                            <?php endfor; ?>
+                    <div style="margin-bottom: 20px;">
+                        <p style="margin-bottom: 10px;">Votre note :</p>
+                        <div class="star-rating">
+                            <span class="star" data-value="1">★</span>
+                            <span class="star" data-value="2">★</span>
+                            <span class="star" data-value="3">★</span>
+                            <span class="star" data-value="4">★</span>
+                            <span class="star" data-value="5">★</span>
+                            <span id="rating-text" style="margin-left: 10px; font-size: 14px;"></span>
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="commentaire">Votre commentaire :</label>
-                        <textarea id="commentaire" name="commentaire" rows="4" required></textarea>
-                    </div>
-                    
-                    <button type="submit" class="btn-submit">Envoyer</button>
+                    <button type="submit" id="submit-rating" style="display: block; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                        Envoyer votre note
+                    </button>
                 </form>
+                
+                <style>
+                    .star-rating {
+                        display: flex;
+                        align-items: center;
+                    }
+                    .star {
+                        font-size: 30px;
+                        color: #ddd;
+                        cursor: pointer;
+                        transition: color 0.2s;
+                    }
+                    .star.active {
+                        color: #FFD700;
+                    }
+                    #submit-rating {
+                        opacity: 0.5;
+                        pointer-events: none;
+                    }
+                    #submit-rating.active {
+                        opacity: 1;
+                        pointer-events: auto;
+                    }
+                </style>
+                
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const stars = document.querySelectorAll('.star');
+                        const ratingInput = document.getElementById('selected-rating');
+                        const submitButton = document.getElementById('submit-rating');
+                        const ratingText = document.getElementById('rating-text');
+                        const ratingLabels = ['Très mauvais', 'Mauvais', 'Moyen', 'Bon', 'Excellent'];
+                        
+                        // Désactiver le bouton d'envoi jusqu'à ce qu'une note soit sélectionnée
+                        submitButton.classList.remove('active');
+                        
+                        stars.forEach((star, index) => {
+                            star.addEventListener('mouseover', function() {
+                                // Effet de survol
+                                for (let i = 0; i <= index; i++) {
+                                    stars[i].classList.add('active');
+                                }
+                                for (let i = index + 1; i < stars.length; i++) {
+                                    stars[i].classList.remove('active');
+                                }
+                                ratingText.textContent = ratingLabels[index];
+                            });
+                            
+                            star.addEventListener('mouseout', function() {
+                                // Rétablir l'affichage si aucune note n'est sélectionnée
+                                if (!ratingInput.value) {
+                                    stars.forEach(s => s.classList.remove('active'));
+                                    ratingText.textContent = '';
+                                } else {
+                                    // Sinon, afficher la note sélectionnée
+                                    const selectedIndex = parseInt(ratingInput.value) - 1;
+                                    for (let i = 0; i <= selectedIndex; i++) {
+                                        stars[i].classList.add('active');
+                                    }
+                                    for (let i = selectedIndex + 1; i < stars.length; i++) {
+                                        stars[i].classList.remove('active');
+                                    }
+                                    ratingText.textContent = ratingLabels[selectedIndex];
+                                }
+                            });
+                            
+                            star.addEventListener('click', function() {
+                                const value = this.getAttribute('data-value');
+                                ratingInput.value = value;
+                                
+                                // Activer le bouton d'envoi
+                                submitButton.classList.add('active');
+                                
+                                // Mettre à jour l'affichage des étoiles
+                                for (let i = 0; i <= index; i++) {
+                                    stars[i].classList.add('active');
+                                }
+                                for (let i = index + 1; i < stars.length; i++) {
+                                    stars[i].classList.remove('active');
+                                }
+                                
+                                ratingText.textContent = ratingLabels[index];
+                            });
+                        });
+                        
+                        // Validation du formulaire
+                        document.getElementById('rating-form').addEventListener('submit', function(e) {
+                            if (!ratingInput.value) {
+                                e.preventDefault();
+                                alert('Veuillez sélectionner une note avant d\'envoyer.');
+                            }
+                        });
+                    });
+                </script>
             </div>
             <?php endif; ?>
             
             <?php if (empty($evaluations)): ?>
-                <p class="no-avis">Aucun avis pour le moment</p>
+                <p class="no-avis">Aucune note pour le moment</p>
             <?php else: ?>
                 <div class="avis-list">
-                    <?php foreach ($evaluations as $avis): ?>
-                    <div class="avis-item">
-                        <div class="avis-header">
-                            <div class="avis-user"><?= htmlspecialchars($avis['prenom']) ?> <?= htmlspecialchars($avis['nom']) ?></div>
-                            <div class="avis-rating">
-                                <?php for ($i = 1; $i <= 5; $i++): ?>
-                                <span class="star <?= $i <= $avis['note'] ? 'full' : 'empty' ?>">★</span>
-                                <?php endfor; ?>
+                    <div class="rating-distribution">
+                        <h3>Distribution des notes (<?= count($evaluations) ?> notes)</h3>
+                        <div class="rating-bars">
+                            <?php 
+                            $total = count($evaluations);
+                            $counts = array_fill(1, 5, 0);
+                            foreach ($evaluations as $avis) {
+                                $counts[$avis['note']]++;
+                            }
+                            for ($i = 5; $i >= 1; $i--): 
+                                $percentage = $total > 0 ? ($counts[$i] / $total) * 100 : 0;
+                            ?>
+                            <div class="rating-bar">
+                                <div class="rating-label"><?= $i ?> ★</div>
+                                <div class="bar-container">
+                                    <div class="bar" style="width: <?= $percentage ?>%"></div>
+                                </div>
+                                <div class="rating-count"><?= $counts[$i] ?></div>
                             </div>
-                        </div>
-                        <div class="avis-content">
-                            <p><?= nl2br(htmlspecialchars($avis['commentaire'])) ?></p>
+                            <?php endfor; ?>
                         </div>
                     </div>
-                    <?php endforeach; ?>
                 </div>
             <?php endif; ?>
         </div>

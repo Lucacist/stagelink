@@ -1,82 +1,50 @@
 document.addEventListener("DOMContentLoaded", function () {
-  document.querySelectorAll(".stars").forEach((starsContainer) => {
-    const stars = starsContainer.querySelectorAll(".star");
-    const entrepriseId = starsContainer.dataset.entrepriseId;
-    let userRating = starsContainer.dataset.rating;
-
-    // Initialiser les étoiles avec la note de l'utilisateur si elle existe
-    if (userRating) {
-      updateStarsDisplay(stars, userRating);
-    }
-
-    stars.forEach((star) => {
-      // Gestion du survol
-      star.addEventListener("mouseover", function () {
-        updateStarsDisplay(stars, this.dataset.value);
-      });
-
-      // Rétablir l'affichage initial quand la souris quitte la zone
-      starsContainer.addEventListener("mouseleave", function () {
-        updateStarsDisplay(stars, userRating);
-      });
-
-      // Gestion du clic
-      star.addEventListener("click", async function (e) {
-        e.preventDefault();
-        
-        if (!confirm("Voulez-vous vraiment noter cette entreprise ?")) {
-          return false;
-        }
-
-        try {
-          const rating = this.dataset.value;
-          const response = await fetch("/WEB4ALL-stagelink/index.php?route=rate_entreprise", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: `entreprise_id=${entrepriseId}&note=${rating}`,
-          });
-
-          const data = await response.json();
-
-          if (data.success) {
-            // Mettre à jour la note utilisateur
-            starsContainer.dataset.rating = rating;
-            userRating = rating;
-
-            // Mettre à jour le compteur d'avis
-            const avisCount = starsContainer.parentElement.querySelector(".avis-count");
-            if (avisCount) {
-              avisCount.textContent = data.nombre_avis + " avis";
-            }
-
-            // Mettre à jour les étoiles
-            updateStarsDisplay(stars, rating);
-            alert("Merci pour votre évaluation !");
+  // Gestion du formulaire de notation standard
+  const ratingForm = document.querySelector(".avis-form");
+  if (ratingForm) {
+    const stars = ratingForm.querySelectorAll(".stars-input input");
+    const labels = ratingForm.querySelectorAll(".stars-input label");
+    
+    // Ajouter une classe active lorsqu'une étoile est sélectionnée
+    stars.forEach((star, index) => {
+      star.addEventListener("change", function() {
+        // Mettre à jour l'apparence des étoiles
+        labels.forEach((label, i) => {
+          if (i <= index) {
+            label.classList.add("active");
           } else {
-            throw new Error(data.message || "Erreur lors de l'évaluation");
+            label.classList.remove("active");
           }
-        } catch (error) {
-          console.error("Erreur:", error);
-          alert("Une erreur est survenue lors de l'évaluation");
-        }
-        
-        return false;
+        });
       });
+    });
+    
+    // Soumettre le formulaire normalement (pas d'AJAX)
+    ratingForm.addEventListener("submit", function(e) {
+      // Vérifier qu'une note a été sélectionnée
+      const selectedRating = ratingForm.querySelector('input[name="note"]:checked');
+      if (!selectedRating) {
+        e.preventDefault();
+        alert("Veuillez sélectionner une note avant de soumettre.");
+        return false;
+      }
+      
+      // Le formulaire sera soumis normalement
+      return true;
+    });
+  }
+  
+  // Affichage des étoiles pour les notes existantes
+  document.querySelectorAll(".rating-display").forEach((container) => {
+    const rating = parseFloat(container.dataset.rating) || 0;
+    const stars = container.querySelectorAll(".star");
+    
+    stars.forEach((star, index) => {
+      if (index < rating) {
+        star.classList.add("full");
+      } else {
+        star.classList.add("empty");
+      }
     });
   });
 });
-
-// Fonction utilitaire pour mettre à jour l'affichage des étoiles
-function updateStarsDisplay(stars, rating) {
-  stars.forEach((s) => {
-    if (s.dataset.value <= rating) {
-      s.classList.remove("far");
-      s.classList.add("fas");
-    } else {
-      s.classList.remove("fas");
-      s.classList.add("far");
-    }
-  });
-}

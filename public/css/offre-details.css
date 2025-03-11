@@ -17,17 +17,7 @@
   width: fit-content;
 }
 
-.navbar:hover {
-  color: var(--primary-color);
-}
 
-.navbar svg path {
-  transition: fill 0.3s;
-}
-
-.navbar:hover svg path {
-  fill: var(--primary-color);
-}
 
 .offre-content {
   background: white;

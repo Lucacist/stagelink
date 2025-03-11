@@ -268,26 +268,9 @@
 
 .stars-input input:checked ~ label,
 .stars-input label:hover ~ label,
-.stars-input label:hover {
+.stars-input label:hover,
+.stars-input label.active {
   color: var(--couleur-avis);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.form-group label {
-  font-weight: 500;
-}
-
-.form-group textarea {
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  resize: vertical;
-  font-family: inherit;
 }
 
 .btn-submit {
@@ -304,6 +287,57 @@
 
 .btn-submit:hover {
   background-color: var(--primary-dark);
+}
+
+/* Nouvelle section de distribution des notes */
+.rating-distribution {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.rating-distribution h3 {
+  font-size: 18px;
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: var(--primary-color);
+}
+
+.rating-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rating-bar {
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  align-items: center;
+  gap: 10px;
+}
+
+.rating-label {
+  font-size: 14px;
+  text-align: center;
+}
+
+.bar-container {
+  background-color: #f0f0f0;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.bar {
+  height: 100%;
+  background-color: var(--couleur-avis);
+}
+
+.rating-count {
+  font-size: 14px;
+  color: #666;
+  text-align: right;
 }
 
 .avis-list {
@@ -356,6 +390,10 @@
   .rating-input {
     flex-direction: column;
     align-items: flex-start;
+  }
+  
+  .rating-bar {
+    grid-template-columns: 40px 1fr 30px;
   }
   
   .avis-header {

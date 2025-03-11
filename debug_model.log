@@ -1,0 +1,8 @@
+Début rateEntreprise: 
+entrepriseId: 2, userId: 1, note: 2
+Aucune évaluation existante, création d'une nouvelle
+Résultat INSERT: Succès
+Début rateEntreprise: 
+entrepriseId: 2, userId: 1, note: 3
+Évaluation existante trouvée avec ID: 2
+Résultat UPDATE: Succès
