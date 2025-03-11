@@ -202,5 +202,33 @@ class OffreModel {
         
         return $competences;
     }
+    public function countAllOffres() {
+        $sql = "SELECT COUNT(*) as total FROM Offres";
+        $result = $this->db->query($sql);
+        $row = $result->fetch_assoc();
+        return $row['total'];
+    }
+    
+    public function getOffresWithPagination($limit, $offset) {
+        $sql = "SELECT o.*, e.nom as entreprise_nom 
+                FROM Offres o
+                JOIN Entreprises e ON o.entreprise_id = e.id
+                ORDER BY o.date_debut DESC
+                LIMIT ?, ?";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("ii", $offset, $limit);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        $offres = [];
+        while ($row = $result->fetch_assoc()) {
+            $row['competences'] = $this->getCompetencesForOffre($row['id']);
+            $offres[] = $row;
+        }
+        
+        return $offres;
+    }
+    
 }
 ?>
