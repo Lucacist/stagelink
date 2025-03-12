@@ -1,6 +1,6 @@
 <?php
-$pageTitle = $pageTitle ?? "Accueil - StageLink"; 
-include('header.php'); 
+$pageTitle = $pageTitle ?? "Accueil - StageLink";
+include('header.php');
 ?>
 
 <head>
@@ -79,4 +79,38 @@ include('header.php');
         </div>
     </div>
 </section>
+<section>
+    <div class="contain3">
+        <img class="img-download" img src="public\images\accueil\telechargement.png" alt="">
+        <div class="contexte">
+            <div class="titre">Téléchargez l'app <br>
+                <span class="gras">pour ne rien manquer</span>
+            </div>
+            <div class="texte">Faites avancer votre recherche et suivez les nouveaux jobs où que vous soyez.</div>
+            <div class="texte gras">Bientôt disponible</div>
+            <div class="container-bouton">
+                <div class="bouton">
+                    <img class="svg-download" src="public\images\accueil\gg-play.png" alt="">
+                    <div class="texte">Google Play</div>
+                </div>
+                <div class="bouton">
+                    <img class="svg-download" src="public\images\accueil\apple.svg" alt="">
+                    <div class="texte">Apple Store</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="job">
+    <section>
+        <div class="contain4">
+            <div class="titre">Tout connaître<br>
+                <span class="gras">du monde de l'emploi</span>
+            </div>
+            <div class="texte">Plongez dans l’actualité de l’emploi, découvrez nos conseils pour décrocher votre job
+                idéal, vous épanouir au travail, et accédez aux clés pour booster votre vie professionnelle.</div>
+        </div>
+    </section>
+</div>
+
 <?php include("footer.php"); ?>

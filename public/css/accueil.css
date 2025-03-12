@@ -83,6 +83,46 @@ section {
   font-size: 18px;
 }
 
+.img-download {
+  width: 500px;
+margin-left: auto;}
+.gras {
+  font-weight: bold;
+}
+.svg-download {
+  height: 20px;
+}
+.container-bouton {
+  display: flex;
+  gap: 30px;
+}
+.bouton {
+  background-color: var(--couleur-button);
+  display: flex;
+  width: fit-content;
+  padding: 10px 15px;
+  border-radius: 100px;
+  gap: 8px;
+}
+.bouton .texte {
+  color: var(--texte-button);
+}
+.contain3 {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+}
+.job {
+  display: flex;
+  background-color: var(--body-spe);
+}
+.contain4 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 @media screen and (max-width: 1000px) {
   .iphone {
     height: 150px;

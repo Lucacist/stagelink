@@ -29,12 +29,28 @@ class UtilisateurModel {
         $result = $stmt->get_result();
         
         if ($row = $result->fetch_assoc()) {
-            if (password_verify($password, $row['mot_de_passe']) || $password === $row['mot_de_passe']) {
+            // Si le mot de passe est déjà haché
+            if (password_verify($password, $row['mot_de_passe'])) {
+                return $row;
+            } 
+            // Si le mot de passe n'est pas haché (pour la migration)
+            else if ($password === $row['mot_de_passe']) {
+                // Mettre à jour le mot de passe avec un hash
+                $this->updatePasswordHash($row['id'], $password);
                 return $row;
             }
         }
         
         return null;
+    }
+    
+    public function updatePasswordHash($userId, $password) {
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+        
+        $sql = "UPDATE Utilisateurs SET mot_de_passe = ? WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("si", $hashedPassword, $userId);
+        return $stmt->execute();
     }
     
     public function getUserRole($userId) {
