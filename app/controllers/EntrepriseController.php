@@ -21,7 +21,7 @@ class EntrepriseController extends Controller {
         $totalEntreprises = $this->entrepriseModel->countAllEntreprises();
         
         // Créer l'objet pagination (12 entreprises par page)
-        $pagination = new Pagination($totalEntreprises, 12, $page);
+        $pagination = new Pagination($totalEntreprises, 5, $page);
         
         // Récupérer les entreprises pour la page actuelle avec leurs évaluations
         $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;

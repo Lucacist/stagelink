@@ -25,7 +25,7 @@ class OffreController extends Controller {
         $totalOffres = $this->offreModel->countAllOffres();
         
         // Créer l'objet pagination (10 offres par page)
-        $pagination = new Pagination($totalOffres, 10, $page);
+        $pagination = new Pagination($totalOffres, 5, $page);
         
         // Récupérer les offres pour la page actuelle
         $offres = $this->offreModel->getOffresWithPagination(
