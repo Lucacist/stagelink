@@ -24,18 +24,42 @@ $error = $error ?? "";
             </div>
 
             <?php if (!empty($error)): ?>
-            <div class="message"><?php echo $error; ?></div>
+                <div class="message"><?php echo $error; ?></div>
             <?php endif; ?>
 
             <form method="POST" action="index.php?route=login">
                 <div class="bloc-input">
                     <label for="">Adresse mail <input type="email" name="email" required /></label>
-                    <label for="">Mot de passe <input type="password" name="mot_de_passe" required /></label>
+                    <label for="">Mot de passe 
+                        <input type="password" name="mot_de_passe" required />
+                        <div class="password-icon">
+                            <i data-feather="eye"></i>
+                            <i data-feather="eye-off"></i>
+                        </div>
+                    </label>
                 </div>
                 <button type="submit">Je me connecte</button>
             </form>
         </div>
     </div>
 </body>
+<script src="https://unpkg.com/feather-icons"></script>
+<script>
+    feather.replace();
+    const eye = document.querySelector(".feather-eye");
+const eyeoff = document.querySelector(".feather-eye-off");
+const passwordField = document.querySelector("input[type=password]");
+eye.addEventListener("click", () => {
+  eye.style.display = "none";
+  eyeoff.style.display = "block";
+  passwordField.type = "text";
+});
+
+eyeoff.addEventListener("click", () => {
+  eyeoff.style.display = "none";
+  eye.style.display = "block";
+  passwordField.type = "password";
+});
+</script>
 
 </html>

@@ -38,6 +38,8 @@ label {
   flex-direction: column;
   font-size: 12px;
   gap: 10px;
+  position: relative;
+  
 }
 
 input {
@@ -85,6 +87,24 @@ form {
   border-radius: 10px;
   width: auto;
 }
+label .password-icon {
+  display: flex;
+  position: absolute;
+  width: 20px;
+  color: var(--couleur-input-border);
+  transition: all 0.2s;
+  right: 8px;
+  bottom: 5px;
+}
+label .password-icon:hover {
+  cursor: pointer;
+  color: #ff4754;
+}
+
+label .password-icon .feather-eye-off {
+  display: none;
+}
+
 
 @media (max-width: 800px) {
   .container {
