@@ -122,6 +122,15 @@ margin-left: auto;}
   flex-direction: column;
   gap: 20px;
 }
+.entreprises {
+  display: flex;
+  width: auto;
+  padding: 0 3rem;
+  justify-content: space-around;
+}
+.entreprises img {
+  height: 30px;
+}
 
 @media screen and (max-width: 1000px) {
   .iphone {

@@ -110,6 +110,20 @@ include('header.php');
             <div class="texte">Plongez dans l’actualité de l’emploi, découvrez nos conseils pour décrocher votre job
                 idéal, vous épanouir au travail, et accédez aux clés pour booster votre vie professionnelle.</div>
         </div>
+        <div class="titre gras">Des entreprises partenaires</div>
+        <div class="entreprises">
+            <img src="public\images\accueil\entreprises\amazonin logo.svg" alt=""><img
+                src="public\images\accueil\entreprises\google-icon logo.svg" alt=""><img
+                src="public\images\accueil\entreprises\intel logo.svg" alt=""><img
+                src="public\images\accueil\entreprises\intellij-original logo.svg" alt=""><img
+                src="public\images\accueil\entreprises\meta logo.svg" alt=""><img
+                src="public\images\accueil\entreprises\microsoft logo.svg" alt=""><img
+                src="public\images\accueil\entreprises\Netflix logo.svg" alt=""><img
+                src="public\images\accueil\entreprises\nvidia logo.svg" alt=""><img
+                src="public\images\accueil\entreprises\spacex logo.svg" alt=""><img
+                src="public\images\accueil\entreprises\spotify logo.svg" alt=""><img
+                src="public\images\accueil\entreprises\Tesla logo.svg" alt="">
+        </div>
     </section>
 </div>
 
