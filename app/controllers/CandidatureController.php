@@ -1,23 +1,47 @@
 <?php
 require_once ROOT_PATH . '/app/controllers/Controller.php';
 require_once ROOT_PATH . '/app/models/OffreModel.php';
+require_once ROOT_PATH . '/app/models/CandidatureModel.php';
 
 class CandidatureController extends Controller {
     private $db;
+    private $candidatureModel;
     
     public function __construct() {
+       // parent::__construct();
         require_once ROOT_PATH . '/app/models/Database.php';
         $this->db = Database::getInstance()->getConnection();
+        $this->candidatureModel = new CandidatureModel();
     }
+
+    /**
+     * Définit un message flash pour affichage ultérieur
+     */
+    public function setFlashMessage($type, $message) {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
     
+        $_SESSION['flash'] = [
+            'type' => $type,
+            'message' => $message
+        ];
+    }
+
+    /**
+     * Affiche toutes les candidatures (admin) ou celles de l'utilisateur courant
+     */
     public function index() {
-        $this->checkPageAccess('VOIR_CANDIDATURES');
-        
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
         
-        $isAdmin = $this->hasPermission('GERER_CANDIDATURES');
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: index.php?route=login');
+            exit;
+        }
+        
+        $isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin';
         
         if ($isAdmin) {
             $sql = "SELECT c.*, o.titre as offre_titre, e.nom as entreprise_nom, u.nom as etudiant_nom, u.prenom as etudiant_prenom
@@ -54,137 +78,199 @@ class CandidatureController extends Controller {
         ]);
     }
     
+    /**
+     * Traite la soumission d'une candidature à partir du formulaire
+     */
     public function postuler() {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
         
+        // Vérifier que l'utilisateur est connecté
         if (!isset($_SESSION['user_id'])) {
-            $this->redirect('login');
+            $this->setFlashMessage('error', 'Vous devez être connecté pour postuler');
+            header('Location: index.php?route=login');
+            exit;
         }
         
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $offreId = isset($_POST['offre_id']) ? (int)$_POST['offre_id'] : 0;
-            $lettre = $_POST['lettre_motivation'] ?? '';
+        // Vérifier la méthode HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->setFlashMessage('error', 'Méthode non autorisée');
+            header('Location: index.php?route=offres');
+            exit;
+        }
+        
+        // Récupérer et valider les données
+        $offre_id = filter_input(INPUT_POST, 'offre_id', FILTER_VALIDATE_INT);
+        $lettre_motivation = htmlspecialchars($_POST['lettre_motivation'] ?? '');
+        
+        if (!$offre_id || empty($lettre_motivation)) {
+            $this->setFlashMessage('error', 'Tous les champs sont obligatoires');
+            header('Location: index.php?route=offre_details&id=' . $offre_id);
+            exit;
+        }
+        
+        // Gérer l'upload du CV
+        $cv = '';
+        $upload_success = false;
+        
+        if (isset($_FILES['cv']) && $_FILES['cv']['error'] === UPLOAD_ERR_OK) {
+            $upload_dir = 'uploads/cv/';
             
-            $cvPath = '';
-            if (isset($_FILES['cv']) && $_FILES['cv']['error'] === UPLOAD_ERR_OK) {
-                $tmpName = $_FILES['cv']['tmp_name'];
-                $fileName = basename($_FILES['cv']['name']);
-                $uploadDir = ROOT_PATH . '/public/uploads/cv/';
-                
-                if (!is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0777, true);
-                }
-                
-                $cvPath = 'cv_' . $_SESSION['user_id'] . '_' . time() . '_' . $fileName;
-                
-                move_uploaded_file($tmpName, $uploadDir . $cvPath);
+            // Créer le répertoire s'il n'existe pas
+            if (!file_exists(ROOT_PATH . '/' . $upload_dir)) {
+                mkdir(ROOT_PATH . '/' . $upload_dir, 0755, true);
             }
             
-            if ($offreId > 0 && !empty($cvPath)) {
-                $sql = "INSERT INTO Candidatures (utilisateur_id, offre_id, date_candidature, cv, lettre_motivation) 
-                        VALUES (?, ?, NOW(), ?, ?)";
-                $stmt = $this->db->prepare($sql);
-                $stmt->bind_param("iiss", $_SESSION['user_id'], $offreId, $cvPath, $lettre);
-                $stmt->execute();
-                
-                $this->redirect('offre_details&id=' . $offreId . '&message=candidature_success');
+            // Vérifier le type de fichier
+            $finfo = new finfo(FILEINFO_MIME_TYPE);
+            $mime_type = $finfo->file($_FILES['cv']['tmp_name']);
+            
+            $allowed_types = ['application/pdf'];
+            
+            if (!in_array($mime_type, $allowed_types)) {
+                $this->setFlashMessage('error', 'Format de fichier non autorisé. Seuls les PDF sont acceptés.');
+                header('Location: index.php?route=offre_details&id=' . $offre_id);
+                exit;
+            }
+            
+            // Vérifier la taille (max 2 Mo)
+            if ($_FILES['cv']['size'] > 2 * 1024 * 1024) {
+                $this->setFlashMessage('error', 'Le fichier est trop volumineux (max 2 Mo)');
+                header('Location: index.php?route=offre_details&id=' . $offre_id);
+                exit;
+            }
+            
+            // Générer un nom de fichier unique
+            $filename = uniqid('cv_') . '_' . $_SESSION['user_id'] . '_' . time() . '.pdf';
+            $file_path = $upload_dir . $filename;
+            
+            if (move_uploaded_file($_FILES['cv']['tmp_name'], ROOT_PATH . '/' . $file_path)) {
+                $cv = $file_path;
+                $upload_success = true;
             } else {
-                $this->redirect('offre_details&id=' . $offreId . '&message=candidature_error');
+                $this->setFlashMessage('error', 'Erreur lors de l\'upload du fichier');
+                header('Location: index.php?route=offre_details&id=' . $offre_id);
+                exit;
             }
         } else {
-            $this->redirect('offres');
+            $this->setFlashMessage('error', 'Le CV est obligatoire');
+            header('Location: index.php?route=offre_details&id=' . $offre_id);
+            exit;
+        }
+        
+        // Enregistrer la candidature
+        if ($upload_success) {
+            $result = $this->candidatureModel->creerCandidature(
+                $_SESSION['user_id'],
+                $offre_id,
+                $lettre_motivation,
+                $cv
+            );
+            
+            if ($result['success']) {
+                $this->setFlashMessage('success', 'Votre candidature a été enregistrée avec succès');
+                header('Location: index.php?route=confirmation_candidature&id=' . $result['id']);
+                exit;
+            } else {
+                // En cas d'erreur, supprimer le fichier uploadé
+                if (file_exists(ROOT_PATH . '/' . $cv)) {
+                    unlink(ROOT_PATH . '/' . $cv);
+                }
+                
+                $this->setFlashMessage('error', $result['message']);
+                header('Location: index.php?route=offre_details&id=' . $offre_id);
+                exit;
+            }
         }
     }
     
-    public function traiter() {
+    /**
+     * Méthode pour générer un token CSRF
+     */
+    public function generateCsrfToken() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        if (!isset($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+        
+        return $_SESSION['csrf_token'];
+    }
+    
+    /**
+     * Affiche les candidatures de l'utilisateur courant
+     */
+    public function mesCandidatures() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        // Vérifier si l'utilisateur est connecté
         if (!isset($_SESSION['user_id'])) {
-            $this->redirect('login');
-            return;
+            header('Location: index.php?route=login');
+            exit;
         }
         
         $utilisateur_id = $_SESSION['user_id'];
+        $candidatures = $this->candidatureModel->getCandidaturesByUtilisateur($utilisateur_id);
         
+        echo $this->render('mes_candidatures', [
+            'pageTitle' => 'Mes candidatures - StageLink',
+            'candidatures' => $candidatures
+        ]);
+    }
+
+    public function afficherConfirmation() {
+        echo $this->render('confirmation_candidature', [
+            'pageTitle' => 'Confirmation de candidature - StageLink'
+        ]);
+    }
+    
+    
+    /**
+     * Traite une candidature (acceptation, refus, etc.)
+     */
+    public function traiter() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        // Vérifier que l'utilisateur est connecté et a les droits
+        if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] != 'admin') {
+            $this->setFlashMessage('error', 'Accès refusé');
+            header('Location: index.php?route=accueil');
+            exit;
+        }
+        
+        // Vérifier la méthode HTTP
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->redirect('offres');
-            return;
+            $this->setFlashMessage('error', 'Méthode non autorisée');
+            header('Location: index.php?route=candidatures');
+            exit;
         }
         
-        $offre_id = isset($_POST['offre_id']) ? (int)$_POST['offre_id'] : 0;
-        $lettre_motivation = trim($_POST['lettre_motivation'] ?? '');
-        $cv_file = isset($_FILES['cv']) ? $_FILES['cv'] : null;
+        $candidature_id = filter_input(INPUT_POST, 'candidature_id', FILTER_VALIDATE_INT);
+        $statut = filter_input(INPUT_POST, 'statut', FILTER_SANITIZE_STRING);
         
-        $errors = [];
-        
-        if ($offre_id <= 0) {
-            $errors[] = "L'ID de l'offre est invalide.";
+        if (!$candidature_id || !in_array($statut, ['en_attente', 'vue', 'retenue', 'refusee'])) {
+            $this->setFlashMessage('error', 'Paramètres invalides');
+            header('Location: index.php?route=candidatures');
+            exit;
         }
         
-        if (empty($lettre_motivation)) {
-            $errors[] = "La lettre de motivation est requise.";
-        }
+        $success = $this->candidatureModel->updateStatut($candidature_id, $statut);
         
-        $cv_path = '';
-        if ($cv_file && $cv_file['error'] == 0) {
-            $allowed_types = ['application/pdf'];
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mime_type = finfo_file($finfo, $cv_file['tmp_name']);
-            finfo_close($finfo);
-            
-            if (!in_array($mime_type, $allowed_types)) {
-                $errors[] = "Le CV doit être au format PDF.";
-            } else {
-                $upload_dir = ROOT_PATH . '/uploads/cv/';
-                if (!file_exists($upload_dir)) {
-                    mkdir($upload_dir, 0777, true);
-                }
-                
-                $cv_filename = uniqid('cv_') . '.pdf';
-                $cv_path = '/uploads/cv/' . $cv_filename;
-                $target_file = ROOT_PATH . $cv_path;
-                
-                if (!move_uploaded_file($cv_file['tmp_name'], $target_file)) {
-                    $errors[] = "Une erreur s'est produite lors du téléchargement du CV.";
-                    $cv_path = '';
-                }
-            }
+        if ($success) {
+            $this->setFlashMessage('success', 'Le statut de la candidature a été mis à jour');
         } else {
-            $errors[] = "Le CV est requis.";
+            $this->setFlashMessage('error', 'Une erreur est survenue lors de la mise à jour');
         }
         
-        $stmt = $this->db->prepare("SELECT id FROM Candidatures WHERE utilisateur_id = ? AND offre_id = ?");
-        $stmt->bind_param("ii", $utilisateur_id, $offre_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        
-        if ($result->num_rows > 0) {
-            $errors[] = "Vous avez déjà candidaté pour cette offre.";
-        }
-        
-        if (empty($errors)) {
-            $date_candidature = date('Y-m-d H:i:s');
-            $statut = 'en attente';
-            
-            $stmt = $this->db->prepare("INSERT INTO Candidatures (utilisateur_id, offre_id, date_candidature, lettre_motivation, cv_path, statut) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("iissss", $utilisateur_id, $offre_id, $date_candidature, $lettre_motivation, $cv_path, $statut);
-            
-            if ($stmt->execute()) {
-                $_SESSION['success_message'] = "Votre candidature a été enregistrée avec succès.";
-            } else {
-                $_SESSION['error_message'] = "Une erreur s'est produite lors de l'enregistrement de votre candidature.";
-                if (!empty($cv_path)) {
-                    @unlink(ROOT_PATH . $cv_path);
-                }
-            }
-        } else {
-            $_SESSION['error_message'] = implode('<br>', $errors);
-            if (!empty($cv_path)) {
-                @unlink(ROOT_PATH . $cv_path);
-            }
-        }
-        
-        $this->redirect('offre_details&id=' . $offre_id);
+        header('Location: index.php?route=candidatures');
+        exit;
     }
 }
 ?>

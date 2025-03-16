@@ -7,10 +7,11 @@ define('ROOT_PATH', __DIR__);
 
 // Inclure la configuration
 require_once ROOT_PATH . '/config/config.php';
+require_once 'app/controllers/CandidatureController.php';
 
 // Si l'utilisateur n'est pas connecté et essaie d'accéder à une route qui nécessite une authentification,
 // il est redirigé vers la page de connexion
-$public_routes = ['login', 'logout'];
+$public_routes = ['login', 'logout', 'accueil', 'offres', 'offre_details'];
 $route = isset($_GET['route']) ? $_GET['route'] : 'accueil';
 
 // Rediriger vers login si l'utilisateur n'est pas connecté et tente d'accéder à une route protégée
@@ -70,9 +71,9 @@ switch ($route) {
         break;
     
     case 'like':
-        require_once ROOT_PATH . '/app/controllers/WishlistController.php';
-        $controller = new WishlistController();
-        $controller->toggleLike();
+        require_once ROOT_PATH . '/app/controllers/OffreController.php';
+        $controller = new OffreController();
+        $controller->like();
         break;
     
     case 'rate_entreprise':
@@ -98,13 +99,7 @@ switch ($route) {
         $controller = new OffreController();
         $controller->traiter();
         break;
-        
-    case 'like':
-        require_once ROOT_PATH . '/app/controllers/OffreController.php';
-        $controller = new OffreController();
-        $controller->like();
-        break;
-        
+    
     case 'profil':
         require_once ROOT_PATH . '/app/controllers/ProfilController.php';
         $controller = new ProfilController();
@@ -115,6 +110,25 @@ switch ($route) {
         require_once ROOT_PATH . '/app/controllers/AuthController.php';
         $controller = new AuthController();
         $controller->logout();
+        break;
+    
+    case 'candidature_postuler':
+        $controller = new CandidatureController();
+        $controller->postuler();
+        break;
+    
+    case 'confirmation_candidature':
+        $controller = new CandidatureController();
+            // Remplacer l'appel direct à render() par:
+        $controller->afficherConfirmation();
+        break;
+        
+
+
+    
+    case 'mes_candidatures':
+        $controller = new CandidatureController();
+        $controller->mesCandidatures();
         break;
         
     default:
