@@ -68,6 +68,75 @@ include('header.php');
             </p>
         </div>
 
+<!-- Section de candidature -->
+<?php if(isset($_SESSION['user_id'])): ?>
+    <div class="offre-section candidature-section">
+        <?php 
+        // Vérifier si l'utilisateur a déjà postulé
+        require_once ROOT_PATH . '/app/models/CandidatureModel.php';
+        require_once ROOT_PATH . '/app/models/Database.php';
+        $candidatureModel = new CandidatureModel();
+        $dejaPostule = $candidatureModel->candidatureExiste($_SESSION['user_id'], $offre['id']);
+        
+        if($dejaPostule): 
+        ?>
+            <div class="alert alert-info">
+                Vous avez déjà postulé à cette offre.
+            </div>
+        <?php else: ?>
+            <!-- Vérifier s'il y a des messages flash pour déterminer l'affichage initial -->
+            <?php $afficherFormulaire = isset($_SESSION['flash']); ?>
+            
+            <!-- Bouton pour afficher le formulaire (caché si des messages flash existent) -->
+            <button id="postuler-btn" class="btn-primary" <?php echo $afficherFormulaire ? 'style="display: none;"' : ''; ?>>
+                Postuler à cette offre
+            </button>
+            
+            <!-- Formulaire de candidature (affiché si des messages flash existent) -->
+            <div id="candidature-form-container" class="<?php echo $afficherFormulaire ? '' : 'hidden'; ?>">
+                <h3>Postuler à cette offre</h3>
+                
+                <?php if(isset($_SESSION['flash'])): ?>
+                    <div class="alert alert-<?= $_SESSION['flash']['type'] ?>">
+                        <?= $_SESSION['flash']['message'] ?>
+                    </div>
+                    <?php unset($_SESSION['flash']); ?>
+                <?php endif; ?>
+                
+                <form action="index.php?route=candidature_postuler" method="post" enctype="multipart/form-data" class="candidature-form" id="candidature-form">
+                    <input type="hidden" name="csrf_token" value="<?= (new CandidatureController())->generateCsrfToken() ?>">
+                    <input type="hidden" name="offre_id" value="<?= $offre['id'] ?>">
+                    
+                    <div class="form-group">
+                        <label for="lettre_motivation">Lettre de motivation</label>
+                        <textarea name="lettre_motivation" id="lettre_motivation" class="form-control" rows="6" required><?= isset($_POST['lettre_motivation']) ? htmlspecialchars($_POST['lettre_motivation']) : '' ?></textarea>
+                        <small class="form-text text-muted">Expliquez pourquoi vous êtes intéressé par cette offre et ce que vous pouvez apporter.</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cv">CV (Format PDF uniquement)</label>
+                        <input type="file" name="cv" id="cv" class="form-control-file" accept=".pdf" required>
+                        <small class="form-text text-muted">Taille maximale: 2 Mo</small>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" id="annuler-btn" class="btn-cancel">Annuler</button>
+                        <button type="submit" class="btn-primary">Envoyer ma candidature</button>
+                    </div>
+                </form>
+            </div>
+        <?php endif; ?>
+    </div>
+<?php else: ?>
+    <div class="offre-section">
+        <p class="connexion-required">
+            <a href="index.php?route=login" class="btn-primary">Connectez-vous</a> pour postuler à cette offre.
+        </p>
+    </div>
+<?php endif; ?>
+
+
+
         <?php if(isset($_SESSION['email'])): ?>
         <div class="actions">
             <button id="btn-show-form" class="btn-postuler">Postuler à cette offre</button>

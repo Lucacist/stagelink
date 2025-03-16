@@ -50,5 +50,19 @@ class Controller {
         echo json_encode($data);
         exit();
     }
+    /**
+ * Obtenir le libellé du statut de candidature
+ */
+    protected function getStatusLabel($status) {
+        $labels = [
+            'en_attente' => 'En attente',
+            'acceptee' => 'Acceptée',
+            'refusee' => 'Refusée',
+            'entretien' => 'Entretien planifié'
+        ];
+    
+        return isset($labels[$status]) ? $labels[$status] : $status;
+    }
+
 }
 ?>

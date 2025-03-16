@@ -52,10 +52,14 @@ $route = isset($_GET['route']) ? $_GET['route'] : 'accueil';
         </div>
         <nav>
             <a href="index.php?route=accueil" class="pages <?= ($route == 'accueil') ? 'activer' : '' ?>">Accueil</a>
-            
+    
             <?php if (isset($_SESSION['user_id'])): ?>
                 <a href="index.php?route=offres" class="pages <?= (in_array($route, ['offres', 'offre_details'])) ? 'activer' : '' ?>">Offres</a>
                 <a href="index.php?route=entreprises" class="pages <?= (in_array($route, ['entreprises', 'entreprise_details'])) ? 'activer' : '' ?>">Entreprises</a>
+
+                <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'ETUDIANT'): ?>
+                    <a href="index.php?route=mes_candidatures" class="pages <?= ($route == 'mes_candidatures') ? 'activer' : '' ?>">Mes candidatures</a>
+                <?php endif; ?>
 
                 <?php 
                 if (isset($_SESSION['user_role']) && ($_SESSION['user_role'] === 'ADMIN' || $_SESSION['user_role'] === 'PILOTE')): 
@@ -64,6 +68,7 @@ $route = isset($_GET['route']) ? $_GET['route'] : 'accueil';
                 <?php endif; ?>
             <?php endif; ?>
         </nav>
+
     </header>
     <script src="public/js/search.js"></script>
 </body>
